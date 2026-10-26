@@ -1,0 +1,4 @@
+registration_number,vehicle_type,owner_name,registration_status,tax_token_expiry,fitness_expiry,insurance_expiry,record_status
+DEMO-CR-9101,CAR,Demo Owner One,ACTIVE,2028-12-31,2028-12-31,2028-12-31,ACTIVE
+DEMO-MC-9102,MOTORCYCLE,Demo Owner Two,ACTIVE,2028-06-30,,2028-06-30,ACTIVE
+DEMO-TK-9103,TRUCK,Demo Owner Three,ACTIVE,2020-01-01,2028-12-31,2028-12-31,ACTIVE

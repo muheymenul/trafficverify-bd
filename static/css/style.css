@@ -1,0 +1,104 @@
+body {
+  background-color: #f4f6f9;
+}
+
+.demo-banner {
+  background-color: #fff3cd;
+  color: #664d03;
+  font-size: 0.85rem;
+  text-align: center;
+  padding: 0.35rem 0.5rem;
+  border-bottom: 1px solid #ffecb5;
+}
+
+.auth-card {
+  max-width: 460px;
+  margin: 2rem auto;
+}
+
+.site-footer {
+  font-size: 0.8rem;
+  color: #6c757d;
+}
+
+.stat-number {
+  font-size: 2rem;
+  font-weight: 600;
+  line-height: 1.2;
+}
+
+/* ---------- Admin dashboard ---------- */
+.admin-tabs .nav-link {
+  color: #343a40;
+  white-space: nowrap;
+}
+
+.admin-tabs .nav-link.active {
+  background-color: #212529;
+  color: #fff;
+}
+
+a.stat-link {
+  text-decoration: none;
+  color: inherit;
+  display: block;
+}
+
+a.stat-link .stat-card {
+  transition: box-shadow 0.15s ease-in-out;
+}
+
+a.stat-link:hover .stat-card {
+  box-shadow: 0 0.25rem 0.75rem rgba(0, 0, 0, 0.12);
+}
+
+.stat-officers { border-left: 4px solid #0d6efd; }
+.stat-vehicles { border-left: 4px solid #198754; }
+.stat-licences { border-left: 4px solid #fd7e14; }
+.stat-logs     { border-left: 4px solid #6f42c1; }
+
+
+
+/* ---------- Mobile polish ---------- */
+/* Bigger touch targets (fingers are less exact than a mouse) */
+.btn,
+.form-control,
+.form-select {
+  min-height: 44px;
+}
+
+.btn-sm {
+  min-height: 36px;
+}
+
+/* 16px text in inputs stops phone browsers zooming in when you tap a box */
+.form-control,
+.form-select {
+  font-size: 1rem;
+}
+
+@media (max-width: 575.98px) {
+  .auth-card {
+    margin: 1rem auto;
+  }
+
+  .stat-number {
+    font-size: 1.6rem;
+  }
+
+  .demo-banner {
+    font-size: 0.72rem;
+  }
+
+  main.container {
+    padding-top: 1rem !important;
+  }
+
+  .table {
+    font-size: 0.875rem;
+  }
+
+  .pagination .page-link {
+    padding: 0.55rem 0.8rem;
+  }
+}

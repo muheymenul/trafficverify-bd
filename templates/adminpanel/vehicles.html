@@ -1,0 +1,98 @@
+{% extends "base.html" %}
+{% block title %}Vehicles{% endblock %}
+
+{% block content %}
+<h1 class="h4 mb-3">Admin Dashboard</h1>
+{% include "adminpanel/_tabs.html" %}
+
+<form method="get" class="card card-body shadow-sm mb-3">
+  <div class="row g-2 align-items-end">
+    <div class="col-12 col-lg-3">
+      <label for="q" class="form-label small mb-1">Search</label>
+      <input type="text" id="q" name="q" value="{{ q }}" class="form-control"
+             placeholder="Number or owner" maxlength="50">
+    </div>
+    <div class="col-6 col-lg-2">
+      <label for="type" class="form-label small mb-1">Type</label>
+      <select name="type" id="type" class="form-select">
+        <option value="">All</option>
+        {% for value, label in type_choices %}
+          <option value="{{ value }}" {% if value == selected_type %}selected{% endif %}>{{ label }}</option>
+        {% endfor %}
+      </select>
+    </div>
+    <div class="col-6 col-lg-2">
+      <label for="reg" class="form-label small mb-1">Registration</label>
+      <select name="reg" id="reg" class="form-select">
+        <option value="">All</option>
+        {% for value, label in reg_choices %}
+          <option value="{{ value }}" {% if value == selected_reg %}selected{% endif %}>{{ label }}</option>
+        {% endfor %}
+      </select>
+    </div>
+    <div class="col-6 col-lg-2">
+      <label for="result" class="form-label small mb-1">Result</label>
+      <select name="result" id="result" class="form-select">
+        <option value="">All</option>
+        {% for value, label in result_choices %}
+          <option value="{{ value }}" {% if value == selected_result %}selected{% endif %}>{{ label }}</option>
+        {% endfor %}
+      </select>
+    </div>
+    <div class="col-6 col-lg-3 d-flex gap-2">
+      <button type="submit" class="btn btn-primary flex-fill">Filter</button>
+      <a href="{% url 'adminpanel:vehicles' %}" class="btn btn-outline-secondary flex-fill">Clear</a>
+    </div>
+  </div>
+</form>
+
+<div class="card shadow-sm">
+  {% if page_obj.object_list %}
+  <div class="table-responsive">
+    <table class="table align-middle mb-0">
+      <thead class="table-light">
+        <tr>
+          <th>Number</th><th>Type</th><th>Owner (fictional)</th><th>Registration</th>
+          <th>Documents</th><th>Result</th><th></th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for v in page_obj %}
+        <tr>
+          <td><code>{{ v.registration_number }}</code></td>
+          <td>{{ v.get_vehicle_type_display }}</td>
+          <td>{{ v.owner_name }}</td>
+          <td>
+            {% if v.registration_status == "ACTIVE" %}
+              <span class="badge text-bg-success">{{ v.get_registration_status_display }}</span>
+            {% else %}
+              <span class="badge text-bg-danger">{{ v.get_registration_status_display }}</span>
+            {% endif %}
+            {% if v.record_status != "ACTIVE" %}
+              <span class="badge text-bg-secondary">Inactive record</span>
+            {% endif %}
+          </td>
+          <td>
+            {% for doc in v.docs %}
+              <div class="small text-nowrap">{{ doc.name }}:
+                {% include "includes/result_badge.html" with code=doc.status label=doc.label %}
+              </div>
+            {% endfor %}
+          </td>
+          <td>{% include "includes/result_badge.html" with code=v.overall label=v.overall_label %}</td>
+          <td class="text-end">
+            <a href="{% url 'admin:vehicles_vehicle_change' v.pk %}" class="btn btn-outline-secondary btn-sm">Edit in Django Admin</a>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  {% else %}
+    <div class="card-body text-center text-muted py-5">No vehicles found{% if q or selected_type or selected_reg or selected_result %} for this filter{% endif %}.</div>
+  {% endif %}
+</div>
+
+{% include "includes/pagination.html" %}
+<p class="small text-muted mt-3">DEMO DATA. Result is calculated from today's date and the fictional demo rules.</p>
+{% endblock %}

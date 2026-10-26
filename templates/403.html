@@ -1,0 +1,9 @@
+{% extends "base.html" %}
+{% block title %}Access denied{% endblock %}
+{% block content %}
+<div class="text-center py-5">
+  <h1 class="h3">403 - Access denied</h1>
+  <p class="text-muted">You do not have permission to open this page, or your demo account is not active.</p>
+  <a href="{% url 'accounts:login' %}" class="btn btn-primary">Go to login</a>
+</div>
+{% endblock %}

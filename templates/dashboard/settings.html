@@ -1,0 +1,53 @@
+{% extends "base.html" %}
+{% block title %}Account Settings{% endblock %}
+
+{% block content %}
+<h1 class="h4 mb-3">Account settings</h1>
+
+<div class="row g-3">
+  <div class="col-lg-7">
+    <div class="card shadow-sm h-100"><div class="card-body">
+      <h2 class="h6 mb-3">Account information</h2>
+      <dl class="row mb-0">
+        <dt class="col-sm-4">Username</dt>
+        <dd class="col-sm-8">{{ user.username }}</dd>
+        <dt class="col-sm-4">Email</dt>
+        <dd class="col-sm-8">{{ user.email|default:"-" }}</dd>
+        <dt class="col-sm-4">Role</dt>
+        <dd class="col-sm-8">{{ user.get_role_display }}</dd>
+        <dt class="col-sm-4">Last login</dt>
+        <dd class="col-sm-8">{{ user.last_login|date:"d M Y, H:i"|default:"-" }}</dd>
+        <dt class="col-sm-4">Account created</dt>
+        <dd class="col-sm-8">{{ user.date_joined|date:"d M Y" }}</dd>
+      </dl>
+    </div></div>
+  </div>
+
+  <div class="col-lg-5">
+    <div class="card shadow-sm h-100"><div class="card-body">
+      <h2 class="h6 mb-3">Demo police record</h2>
+      <dl class="row mb-0">
+        <dt class="col-sm-5">Demo Police ID</dt>
+        <dd class="col-sm-7">{{ profile.demo_police_id }}</dd>
+        <dt class="col-sm-5">Name</dt>
+        <dd class="col-sm-7">{{ profile.full_name }}</dd>
+        <dt class="col-sm-5">Rank</dt>
+        <dd class="col-sm-7">{{ profile.get_rank_display }}</dd>
+        <dt class="col-sm-5">Unit</dt>
+        <dd class="col-sm-7">{{ profile.unit }}</dd>
+      </dl>
+      <p class="small text-muted mt-3 mb-0">
+        This is a fictional record. It does not verify any real police identity.
+      </p>
+    </div></div>
+  </div>
+</div>
+
+<div class="card shadow-sm mt-3"><div class="card-body d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-2">
+  <div>
+    <h2 class="h6 mb-1">Password</h2>
+    <p class="small text-muted mb-0">Choose a strong password that you do not use anywhere else.</p>
+  </div>
+  <a href="{% url 'dashboard:password_change' %}" class="btn btn-outline-primary">Change password</a>
+</div></div>
+{% endblock %}

@@ -1,0 +1,97 @@
+{% extends "base.html" %}
+{% block title %}Driving Licence Verification{% endblock %}
+
+{% block content %}
+<div class="d-flex flex-wrap align-items-center gap-2 mb-1">
+  <h1 class="h4 mb-0">Driving Licence Verification</h1>
+  <span class="badge text-bg-warning">DEMO DATA</span>
+</div>
+<p class="text-muted small">
+  Search a licence number in the demo database. Example: <code>DEMO-DL-100001</code>
+</p>
+
+<form method="post" data-loading novalidate class="card card-body shadow-sm mb-4">
+  {% csrf_token %}
+  {% include "includes/form_fields.html" %}
+  <button type="submit" class="btn btn-primary" data-loading-text="Searching...">Verify licence</button>
+</form>
+
+{% if searched %}
+<div class="card shadow-sm mb-3">
+  <div class="card-header bg-white d-flex flex-wrap justify-content-between align-items-center gap-2">
+    <div>
+      <span class="text-muted small">Searched:</span>
+      <code class="fs-6">{{ searched }}</code>
+    </div>
+    <div>
+      <span class="badge text-bg-warning me-1">DEMO DATA</span>
+      {% include "includes/result_badge.html" with code=log.result_category label=log.get_result_category_display %}
+    </div>
+  </div>
+
+  <div class="card-body">
+    {% if not licence %}
+      <div class="text-center py-3">
+        <h2 class="h5">No record found in the demo database.</h2>
+        <p class="text-muted small mb-0">
+          This does not mean the licence is fake or illegal. It only means
+          this number is not in the fictional demo data.
+        </p>
+      </div>
+    {% else %}
+      <div class="row g-3">
+        {% if licence.driver.photo %}
+        <div class="col-auto">
+          <img src="{{ licence.driver.photo.url }}" alt="Fictional demo photo"
+               class="rounded border" style="width:96px;height:120px;object-fit:cover;">
+        </div>
+        {% endif %}
+        <div class="col">
+          <h2 class="h6 mb-3">Licence details</h2>
+          <dl class="row mb-0">
+            <dt class="col-sm-4">Licence number</dt>
+            <dd class="col-sm-8">{{ licence.licence_number }}</dd>
+            <dt class="col-sm-4">Driver (fictional)</dt>
+            <dd class="col-sm-8">{{ licence.driver.full_name }}</dd>
+            <dt class="col-sm-4">Licence class</dt>
+            <dd class="col-sm-8">{{ licence.get_licence_class_display }}</dd>
+            <dt class="col-sm-4">Issue date</dt>
+            <dd class="col-sm-8">{{ licence.issue_date|date:"d M Y" }}</dd>
+            <dt class="col-sm-4">Expiry date</dt>
+            <dd class="col-sm-8">{{ licence.expiry_date|date:"d M Y" }}</dd>
+            <dt class="col-sm-4">Licence status</dt>
+            <dd class="col-sm-8">
+              {% if licence.status == "ACTIVE" %}
+                <span class="badge text-bg-success">{{ licence.get_status_display }}</span>
+              {% else %}
+                <span class="badge text-bg-danger">{{ licence.get_status_display }}</span>
+              {% endif %}
+            </dd>
+          </dl>
+        </div>
+      </div>
+
+      {% if outcome.reasons %}
+        <div class="alert alert-secondary py-2 small mt-3 mb-0">
+          <strong>Why this result:</strong>
+          <ul class="mb-0">
+            {% for reason in outcome.reasons %}<li>{{ reason }}</li>{% endfor %}
+          </ul>
+        </div>
+      {% else %}
+        <p class="small text-muted mt-3 mb-0">Status is active and the licence has not expired in the demo database.</p>
+      {% endif %}
+    {% endif %}
+  </div>
+
+  <div class="card-footer bg-white small text-muted">
+    Verified at <strong>{{ log.created_at|date:"d M Y, H:i:s" }}</strong>
+    {% if previous %}
+      &middot; You last checked this number on {{ previous.created_at|date:"d M Y, H:i" }}
+    {% endif %}
+  </div>
+</div>
+
+{% include "includes/demo_notice.html" %}
+{% endif %}
+{% endblock %}

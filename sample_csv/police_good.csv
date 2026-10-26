@@ -1,0 +1,3 @@
+demo_police_id,full_name,rank,unit,is_eligible,registration_code
+DEMO-P-9101,Demo Officer Import One,SI,Demo Traffic Unit - Zone A,true,ImportCode-9101
+DEMO-P-9102,Demo Officer Import Two,CONSTABLE,Demo Traffic Unit - Zone B,false,ImportCode-9102

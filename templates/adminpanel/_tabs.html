@@ -1,0 +1,22 @@
+{% with name=request.resolver_match.view_name %}
+<ul class="nav nav-pills admin-tabs mb-4 flex-nowrap overflow-auto pb-1">
+  <li class="nav-item">
+    <a class="nav-link {% if name == 'adminpanel:home' %}active{% endif %}" href="{% url 'adminpanel:home' %}">Overview</a>
+  </li>
+  <li class="nav-item">
+    <a class="nav-link {% if name == 'adminpanel:officers' %}active{% endif %}" href="{% url 'adminpanel:officers' %}">Officers</a>
+  </li>
+  <li class="nav-item">
+    <a class="nav-link {% if name == 'adminpanel:vehicles' %}active{% endif %}" href="{% url 'adminpanel:vehicles' %}">Vehicles</a>
+  </li>
+  <li class="nav-item">
+    <a class="nav-link {% if name == 'adminpanel:licences' %}active{% endif %}" href="{% url 'adminpanel:licences' %}">Licences</a>
+  </li>
+  <li class="nav-item">
+    <a class="nav-link {% if name == 'adminpanel:logs' %}active{% endif %}" href="{% url 'adminpanel:logs' %}">Verification Logs</a>
+  </li>
+  <li class="nav-item ms-md-auto">
+    <a class="nav-link" href="{% url 'admin:index' %}">Django Admin &rarr;</a>
+  </li>
+</ul>
+{% endwith %}

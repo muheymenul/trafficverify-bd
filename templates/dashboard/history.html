@@ -1,0 +1,87 @@
+{% extends "base.html" %}
+{% block title %}My History{% endblock %}
+
+{% block content %}
+<h1 class="h4 mb-3">My verification history</h1>
+
+<form method="get" class="card card-body shadow-sm mb-3">
+  <div class="row g-2 align-items-end">
+    <div class="col-12 col-md-4">
+      <label for="type" class="form-label small mb-1">Type</label>
+      <select name="type" id="type" class="form-select">
+        <option value="">All types</option>
+        {% for value, label in type_choices %}
+          <option value="{{ value }}" {% if value == selected_type %}selected{% endif %}>{{ label }}</option>
+        {% endfor %}
+      </select>
+    </div>
+    <div class="col-12 col-md-4">
+      <label for="result" class="form-label small mb-1">Result</label>
+      <select name="result" id="result" class="form-select">
+        <option value="">All results</option>
+        {% for value, label in result_choices %}
+          <option value="{{ value }}" {% if value == selected_result %}selected{% endif %}>{{ label }}</option>
+        {% endfor %}
+      </select>
+    </div>
+    <div class="col-12 col-md-4 d-flex gap-2">
+      <button type="submit" class="btn btn-primary flex-fill">Filter</button>
+      <a href="{% url 'dashboard:history' %}" class="btn btn-outline-secondary flex-fill">Clear</a>
+    </div>
+  </div>
+</form>
+
+<div class="card shadow-sm">
+  {% if page_obj.object_list %}
+    <div class="table-responsive">
+      <table class="table align-middle mb-0">
+        <thead class="table-light">
+          <tr><th>Date and time</th><th>Type</th><th>Searched (masked)</th><th>Result</th></tr>
+        </thead>
+        <tbody>
+          {% for log in page_obj %}
+          <tr>
+            <td class="text-nowrap">{{ log.created_at|date:"d M Y, H:i" }}</td>
+            <td>{{ log.get_verification_type_display }}</td>
+            <td><code>{{ log.masked_identifier }}</code></td>
+            <td>{% include "includes/result_badge.html" with code=log.result_category label=log.get_result_category_display %}</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  {% else %}
+    <div class="card-body text-center text-muted py-5">
+      No history found{% if selected_type or selected_result %} for this filter{% endif %}.
+    </div>
+  {% endif %}
+</div>
+
+{% if page_obj.has_other_pages %}
+<nav class="mt-3" aria-label="History pages">
+  <ul class="pagination justify-content-center">
+    {% if page_obj.has_previous %}
+      <li class="page-item">
+        <a class="page-link" href="?page={{ page_obj.previous_page_number }}{% if querystring %}&{{ querystring }}{% endif %}">Previous</a>
+      </li>
+    {% else %}
+      <li class="page-item disabled"><span class="page-link">Previous</span></li>
+    {% endif %}
+
+    <li class="page-item disabled">
+      <span class="page-link">Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}</span>
+    </li>
+
+    {% if page_obj.has_next %}
+      <li class="page-item">
+        <a class="page-link" href="?page={{ page_obj.next_page_number }}{% if querystring %}&{{ querystring }}{% endif %}">Next</a>
+      </li>
+    {% else %}
+      <li class="page-item disabled"><span class="page-link">Next</span></li>
+    {% endif %}
+  </ul>
+</nav>
+{% endif %}
+
+<p class="small text-muted mt-3">History is read-only and cannot be edited or deleted by officers. Search numbers are partly hidden for privacy.</p>
+{% endblock %}

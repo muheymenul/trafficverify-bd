@@ -1,0 +1,120 @@
+{% extends "base.html" %}
+{% block title %}Vehicle Verification{% endblock %}
+
+{% block content %}
+<div class="d-flex flex-wrap align-items-center gap-2 mb-1">
+  <h1 class="h4 mb-0">Vehicle Verification</h1>
+  <span class="badge text-bg-warning">DEMO DATA</span>
+</div>
+<p class="text-muted small">
+  Search a registration number in the demo database. Example: <code>DEMO-MC-1001</code>
+</p>
+
+<form method="post" data-loading novalidate class="card card-body shadow-sm mb-4">
+  {% csrf_token %}
+  {% include "includes/form_fields.html" %}
+  <button type="submit" class="btn btn-primary" data-loading-text="Searching...">Verify vehicle</button>
+</form>
+
+{% if searched %}
+<div class="card shadow-sm mb-3">
+  <div class="card-header bg-white d-flex flex-wrap justify-content-between align-items-center gap-2">
+    <div>
+      <span class="text-muted small">Searched:</span>
+      <code class="fs-6">{{ searched }}</code>
+    </div>
+    <div>
+      <span class="badge text-bg-warning me-1">DEMO DATA</span>
+      {% include "includes/result_badge.html" with code=log.result_category label=log.get_result_category_display %}
+    </div>
+  </div>
+
+  <div class="card-body">
+    {% if not vehicle %}
+      <div class="text-center py-3">
+        <h2 class="h5">No record found in the demo database.</h2>
+        <p class="text-muted small mb-0">
+          This does not mean the vehicle is illegal or unregistered. It only means
+          this number is not in the fictional demo data.
+        </p>
+      </div>
+    {% else %}
+      <h2 class="h6 mb-3">Vehicle details</h2>
+      <dl class="row mb-3">
+        <dt class="col-sm-4">Registration number</dt>
+        <dd class="col-sm-8">{{ vehicle.registration_number }}</dd>
+        <dt class="col-sm-4">Vehicle type</dt>
+        <dd class="col-sm-8">{{ vehicle.get_vehicle_type_display }}</dd>
+        <dt class="col-sm-4">Owner (fictional)</dt>
+        <dd class="col-sm-8">{{ vehicle.owner_name }}</dd>
+        <dt class="col-sm-4">Registration status</dt>
+        <dd class="col-sm-8">
+          {% if vehicle.registration_status == "ACTIVE" %}
+            <span class="badge text-bg-success">{{ vehicle.get_registration_status_display }}</span>
+          {% else %}
+            <span class="badge text-bg-danger">{{ vehicle.get_registration_status_display }}</span>
+          {% endif %}
+        </dd>
+        <dt class="col-sm-4">Record status</dt>
+        <dd class="col-sm-8">
+          {% if vehicle.record_status == "ACTIVE" %}
+            <span class="badge text-bg-success">{{ vehicle.get_record_status_display }}</span>
+          {% else %}
+            <span class="badge text-bg-secondary">{{ vehicle.get_record_status_display }}</span>
+          {% endif %}
+        </dd>
+      </dl>
+
+      <h2 class="h6 mb-2">Document status</h2>
+      <div class="table-responsive mb-3">
+        <table class="table table-sm align-middle mb-0">
+          <thead class="table-light">
+            <tr><th>Document</th><th>Expiry date</th><th>Status</th></tr>
+          </thead>
+          <tbody>
+            {% for doc in outcome.documents %}
+            <tr>
+              <td>{{ doc.name }}</td>
+              <td class="text-nowrap">
+                {% if doc.status == "NOT_REQUIRED" %}
+                  <span class="text-muted">-</span>
+                {% elif doc.expiry_date %}
+                  {{ doc.expiry_date|date:"d M Y" }}
+                  {% if doc.expiring_soon %}
+                    <span class="small text-warning-emphasis">(in {{ doc.days_left }} day{{ doc.days_left|pluralize }})</span>
+                  {% endif %}
+                {% else %}
+                  <span class="text-muted">Not recorded</span>
+                {% endif %}
+              </td>
+              <td>{% include "includes/result_badge.html" with code=doc.status label=doc.label %}</td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+
+      {% if outcome.reasons %}
+        <div class="alert alert-secondary py-2 small">
+          <strong>Why this result:</strong>
+          <ul class="mb-0">
+            {% for reason in outcome.reasons %}<li>{{ reason }}</li>{% endfor %}
+          </ul>
+        </div>
+      {% else %}
+        <p class="small text-muted">All required documents are valid in the demo database.</p>
+      {% endif %}
+    {% endif %}
+  </div>
+
+  <div class="card-footer bg-white small text-muted">
+    Verified at <strong>{{ log.created_at|date:"d M Y, H:i:s" }}</strong>
+    {% if previous %}
+      &middot; You last checked this number on {{ previous.created_at|date:"d M Y, H:i" }}
+    {% endif %}
+  </div>
+</div>
+
+{% include "includes/demo_notice.html" %}
+{% endif %}
+{% endblock %}

@@ -1,0 +1,13 @@
+{% if code == "VALID" %}
+  <span class="badge text-bg-success">{{ label }}</span>
+{% elif code == "EXPIRED" %}
+  <span class="badge text-bg-warning">{{ label }}</span>
+{% elif code == "INVALID" %}
+  <span class="badge text-bg-danger">{{ label }}</span>
+{% elif code == "NOT_FOUND" %}
+  <span class="badge text-bg-dark">{{ label }}</span>
+{% elif code == "NOT_REQUIRED" %}
+  <span class="badge text-bg-light border">{{ label }}</span>
+{% else %}
+  <span class="badge text-bg-secondary">{{ label }}</span>
+{% endif %}

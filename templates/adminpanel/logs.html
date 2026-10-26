@@ -1,0 +1,78 @@
+{% extends "base.html" %}
+{% block title %}Verification Logs{% endblock %}
+
+{% block content %}
+<h1 class="h4 mb-3">Admin Dashboard</h1>
+{% include "adminpanel/_tabs.html" %}
+
+<form method="get" class="card card-body shadow-sm mb-3">
+  <div class="row g-2 align-items-end">
+    <div class="col-12 col-lg-3">
+      <label for="q" class="form-label small mb-1">Search</label>
+      <input type="text" id="q" name="q" value="{{ q }}" class="form-control"
+             placeholder="Officer, Police ID or number" maxlength="50">
+    </div>
+    <div class="col-6 col-lg-2">
+      <label for="type" class="form-label small mb-1">Type</label>
+      <select name="type" id="type" class="form-select">
+        <option value="">All</option>
+        {% for value, label in type_choices %}
+          <option value="{{ value }}" {% if value == selected_type %}selected{% endif %}>{{ label }}</option>
+        {% endfor %}
+      </select>
+    </div>
+    <div class="col-6 col-lg-2">
+      <label for="result" class="form-label small mb-1">Result</label>
+      <select name="result" id="result" class="form-select">
+        <option value="">All</option>
+        {% for value, label in result_choices %}
+          <option value="{{ value }}" {% if value == selected_result %}selected{% endif %}>{{ label }}</option>
+        {% endfor %}
+      </select>
+    </div>
+    <div class="col-6 col-lg-2">
+      <label for="from" class="form-label small mb-1">From</label>
+      <input type="date" id="from" name="from" value="{{ date_from }}" class="form-control">
+    </div>
+    <div class="col-6 col-lg-2">
+      <label for="to" class="form-label small mb-1">To</label>
+      <input type="date" id="to" name="to" value="{{ date_to }}" class="form-control">
+    </div>
+    <div class="col-12 col-lg-1 d-flex gap-2">
+      <button type="submit" class="btn btn-primary flex-fill">Go</button>
+    </div>
+    <div class="col-12">
+      <a href="{% url 'adminpanel:logs' %}" class="small">Clear all filters</a>
+    </div>
+  </div>
+</form>
+
+<div class="card shadow-sm">
+  {% if page_obj.object_list %}
+  <div class="table-responsive">
+    <table class="table align-middle mb-0">
+      <thead class="table-light">
+        <tr><th>Date and time</th><th>Officer</th><th>Demo Police ID</th><th>Type</th><th>Searched number</th><th>Result</th></tr>
+      </thead>
+      <tbody>
+        {% for log in page_obj %}
+        <tr>
+          <td class="text-nowrap">{{ log.created_at|date:"d M Y, H:i:s" }}</td>
+          <td>{{ log.officer.username }}</td>
+          <td>{{ log.officer.police_profile.demo_police_id|default:"-" }}</td>
+          <td>{{ log.get_verification_type_display }}</td>
+          <td><code>{{ log.searched_identifier }}</code></td>
+          <td>{% include "includes/result_badge.html" with code=log.result_category label=log.get_result_category_display %}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  {% else %}
+    <div class="card-body text-center text-muted py-5">No verification logs found{% if q or selected_type or selected_result or date_from or date_to %} for this filter{% endif %}.</div>
+  {% endif %}
+</div>
+
+{% include "includes/pagination.html" %}
+<p class="small text-muted mt-3">The audit log is read-only. Logs can not be edited or deleted from this system.</p>
+{% endblock %}

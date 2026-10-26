@@ -1,0 +1,15 @@
+venv/
+.venv/
+.env
+db.sqlite3
+*.sqlite3
+__pycache__/
+*.py[cod]
+media/
+staticfiles/
+.vscode/
+.idea/
+Thumbs.db
+.DS_Store
+demo_output/
+test_result.txt

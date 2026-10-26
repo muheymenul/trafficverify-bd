@@ -1,0 +1,198 @@
+{% extends "base.html" %}
+{% block title %}Admin Dashboard{% endblock %}
+
+{% block content %}
+<div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-3">
+  <div>
+    <span class="badge text-bg-warning mb-1">DEMO SYSTEM</span>
+    <h1 class="h4 mb-0">Admin Dashboard</h1>
+    <p class="text-muted small mb-0">Signed in as administrator <strong>{{ user.username }}</strong>. All records are fictional.</p>
+  </div>
+  <a href="{% url 'admin:index' %}" class="btn btn-outline-dark btn-sm">Open Django Admin</a>
+</div>
+
+{% include "adminpanel/_tabs.html" %}
+
+<div class="row g-3 mb-3">
+  <div class="col-6 col-lg-3">
+    <a href="{% url 'adminpanel:officers' %}" class="stat-link">
+      <div class="card h-100 stat-card stat-officers"><div class="card-body">
+        <div class="small text-muted">Officers</div>
+        <div class="stat-number">{{ officer_total }}</div>
+        <div class="small text-muted">{{ officer_active }} active</div>
+      </div></div>
+    </a>
+  </div>
+  <div class="col-6 col-lg-3">
+    <a href="{% url 'adminpanel:vehicles' %}" class="stat-link">
+      <div class="card h-100 stat-card stat-vehicles"><div class="card-body">
+        <div class="small text-muted">Vehicles</div>
+        <div class="stat-number">{{ vehicle_total }}</div>
+        <div class="small text-muted">demo records</div>
+      </div></div>
+    </a>
+  </div>
+  <div class="col-6 col-lg-3">
+    <a href="{% url 'adminpanel:licences' %}" class="stat-link">
+      <div class="card h-100 stat-card stat-licences"><div class="card-body">
+        <div class="small text-muted">Driving licences</div>
+        <div class="stat-number">{{ licence_total }}</div>
+        <div class="small text-muted">demo records</div>
+      </div></div>
+    </a>
+  </div>
+  <div class="col-6 col-lg-3">
+    <a href="{% url 'adminpanel:logs' %}" class="stat-link">
+      <div class="card h-100 stat-card stat-logs"><div class="card-body">
+        <div class="small text-muted">Verifications</div>
+        <div class="stat-number">{{ log_total }}</div>
+        <div class="small text-muted">{{ log_today }} today</div>
+      </div></div>
+    </a>
+  </div>
+</div>
+
+<div class="alert alert-light border small mb-4">
+  <strong>Police records:</strong> {{ police_total }} total
+  &middot; {{ police_claimed }} registered
+  &middot; {{ police_disabled }} disabled.
+</div>
+
+<div class="row g-3 mb-4">
+  <div class="col-lg-8">
+    <div class="card shadow-sm h-100">
+      <div class="card-header bg-white d-flex justify-content-between align-items-center">
+        <strong>Recent verification activity</strong>
+        <a href="{% url 'adminpanel:logs' %}" class="small">View all</a>
+      </div>
+      {% if recent_logs %}
+      <div class="table-responsive">
+        <table class="table table-sm align-middle mb-0">
+          <thead class="table-light">
+            <tr><th>Time</th><th>Officer</th><th>Type</th><th>Searched</th><th>Result</th></tr>
+          </thead>
+          <tbody>
+            {% for log in recent_logs %}
+            <tr>
+              <td class="text-nowrap">{{ log.created_at|date:"d M, H:i" }}</td>
+              <td>
+                {{ log.officer.username }}
+                <div class="small text-muted">{{ log.officer.police_profile.demo_police_id }}</div>
+              </td>
+              <td>{{ log.get_verification_type_display }}</td>
+              <td><code>{{ log.searched_identifier }}</code></td>
+              <td>{% include "includes/result_badge.html" with code=log.result_category label=log.get_result_category_display %}</td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+      {% else %}
+        <div class="card-body text-center text-muted py-4">No verification activity yet.</div>
+      {% endif %}
+    </div>
+  </div>
+
+  <div class="col-lg-4">
+    <div class="card shadow-sm h-100">
+      <div class="card-header bg-white"><strong>Results breakdown</strong></div>
+      <div class="card-body">
+        {% if log_total %}
+          {% for item in breakdown %}
+            <div class="mb-3">
+              <div class="d-flex justify-content-between small">
+                <span>{{ item.label }}</span>
+                <span>{{ item.count }} ({{ item.percent }}%)</span>
+              </div>
+              <div class="progress" role="progressbar" aria-label="{{ item.label }}" aria-valuenow="{{ item.percent }}" aria-valuemin="0" aria-valuemax="100" style="height: 8px;">
+                <div class="progress-bar {% if item.code == 'VALID' %}bg-success{% elif item.code == 'EXPIRED' %}bg-warning{% elif item.code == 'INVALID' %}bg-danger{% elif item.code == 'NOT_FOUND' %}bg-dark{% else %}bg-secondary{% endif %}" style="width: {{ item.percent }}%;"></div>
+              </div>
+            </div>
+          {% endfor %}
+        {% else %}
+          <p class="text-muted text-center mb-0">No data yet.</p>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="row g-3">
+  <div class="col-xl-4">
+    <div class="card shadow-sm h-100">
+      <div class="card-header bg-white"><strong>Recently registered officers</strong></div>
+      {% if recent_officers %}
+      <div class="table-responsive">
+        <table class="table table-sm align-middle mb-0">
+          <thead class="table-light"><tr><th>Username</th><th>Police ID</th><th>Joined</th></tr></thead>
+          <tbody>
+            {% for o in recent_officers %}
+            <tr>
+              <td>{{ o.username }}</td>
+              <td>{{ o.police_profile.demo_police_id|default:"-" }}</td>
+              <td class="text-nowrap">{{ o.date_joined|date:"d M Y" }}</td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+      {% else %}
+        <div class="card-body text-center text-muted">No officers yet.</div>
+      {% endif %}
+    </div>
+  </div>
+
+  <div class="col-xl-4">
+    <div class="card shadow-sm h-100">
+      <div class="card-header bg-white"><strong>Recently added vehicles</strong></div>
+      {% if recent_vehicles %}
+      <div class="table-responsive">
+        <table class="table table-sm align-middle mb-0">
+          <thead class="table-light"><tr><th>Number</th><th>Type</th><th>Added</th></tr></thead>
+          <tbody>
+            {% for v in recent_vehicles %}
+            <tr>
+              <td><code>{{ v.registration_number }}</code></td>
+              <td>{{ v.get_vehicle_type_display }}</td>
+              <td class="text-nowrap">{{ v.created_at|date:"d M Y" }}</td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+      {% else %}
+        <div class="card-body text-center text-muted">No vehicles yet.</div>
+      {% endif %}
+    </div>
+  </div>
+
+  <div class="col-xl-4">
+    <div class="card shadow-sm h-100">
+      <div class="card-header bg-white"><strong>Recently added licences</strong></div>
+      {% if recent_licences %}
+      <div class="table-responsive">
+        <table class="table table-sm align-middle mb-0">
+          <thead class="table-light"><tr><th>Number</th><th>Driver</th><th>Added</th></tr></thead>
+          <tbody>
+            {% for l in recent_licences %}
+            <tr>
+              <td><code>{{ l.licence_number }}</code></td>
+              <td>{{ l.driver.full_name }}</td>
+              <td class="text-nowrap">{{ l.created_at|date:"d M Y" }}</td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+      {% else %}
+        <div class="card-body text-center text-muted">No licences yet.</div>
+      {% endif %}
+    </div>
+  </div>
+</div>
+
+<p class="small text-muted mt-4">
+  DEMO DATA. Results here mean "valid according to the fictional demo records" only.
+  This is not an official Bangladesh Police or BRTA system.
+</p>
+{% endblock %}

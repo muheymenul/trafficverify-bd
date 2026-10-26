@@ -1,0 +1,90 @@
+{% extends "base.html" %}
+{% block title %}Licences{% endblock %}
+
+{% block content %}
+<h1 class="h4 mb-3">Admin Dashboard</h1>
+{% include "adminpanel/_tabs.html" %}
+
+<form method="get" class="card card-body shadow-sm mb-3">
+  <div class="row g-2 align-items-end">
+    <div class="col-12 col-lg-3">
+      <label for="q" class="form-label small mb-1">Search</label>
+      <input type="text" id="q" name="q" value="{{ q }}" class="form-control"
+             placeholder="Licence number or driver" maxlength="50">
+    </div>
+    <div class="col-6 col-lg-2">
+      <label for="class" class="form-label small mb-1">Class</label>
+      <select name="class" id="class" class="form-select">
+        <option value="">All</option>
+        {% for value, label in class_choices %}
+          <option value="{{ value }}" {% if value == selected_class %}selected{% endif %}>{{ label }}</option>
+        {% endfor %}
+      </select>
+    </div>
+    <div class="col-6 col-lg-2">
+      <label for="status" class="form-label small mb-1">Status</label>
+      <select name="status" id="status" class="form-select">
+        <option value="">All</option>
+        {% for value, label in status_choices %}
+          <option value="{{ value }}" {% if value == selected_status %}selected{% endif %}>{{ label }}</option>
+        {% endfor %}
+      </select>
+    </div>
+    <div class="col-6 col-lg-2">
+      <label for="result" class="form-label small mb-1">Result</label>
+      <select name="result" id="result" class="form-select">
+        <option value="">All</option>
+        {% for value, label in result_choices %}
+          <option value="{{ value }}" {% if value == selected_result %}selected{% endif %}>{{ label }}</option>
+        {% endfor %}
+      </select>
+    </div>
+    <div class="col-6 col-lg-3 d-flex gap-2">
+      <button type="submit" class="btn btn-primary flex-fill">Filter</button>
+      <a href="{% url 'adminpanel:licences' %}" class="btn btn-outline-secondary flex-fill">Clear</a>
+    </div>
+  </div>
+</form>
+
+<div class="card shadow-sm">
+  {% if page_obj.object_list %}
+  <div class="table-responsive">
+    <table class="table align-middle mb-0">
+      <thead class="table-light">
+        <tr>
+          <th>Licence number</th><th>Driver (fictional)</th><th>Class</th>
+          <th>Issued</th><th>Expires</th><th>Status</th><th>Result</th><th></th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for l in page_obj %}
+        <tr>
+          <td><code>{{ l.licence_number }}</code></td>
+          <td>{{ l.driver.full_name }}</td>
+          <td>{{ l.get_licence_class_display }}</td>
+          <td class="text-nowrap">{{ l.issue_date|date:"d M Y" }}</td>
+          <td class="text-nowrap">{{ l.expiry_date|date:"d M Y" }}</td>
+          <td>
+            {% if l.status == "ACTIVE" %}
+              <span class="badge text-bg-success">{{ l.get_status_display }}</span>
+            {% else %}
+              <span class="badge text-bg-danger">{{ l.get_status_display }}</span>
+            {% endif %}
+          </td>
+          <td>{% include "includes/result_badge.html" with code=l.overall label=l.overall_label %}</td>
+          <td class="text-end">
+            <a href="{% url 'admin:licences_drivinglicence_change' l.pk %}" class="btn btn-outline-secondary btn-sm">Edit in Django Admin</a>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  {% else %}
+    <div class="card-body text-center text-muted py-5">No licences found{% if q or selected_class or selected_status or selected_result %} for this filter{% endif %}.</div>
+  {% endif %}
+</div>
+
+{% include "includes/pagination.html" %}
+<p class="small text-muted mt-3">DEMO DATA. Result is calculated from today's date and the fictional demo rules.</p>
+{% endblock %}

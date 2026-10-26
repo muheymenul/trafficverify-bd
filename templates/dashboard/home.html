@@ -1,0 +1,91 @@
+{% extends "base.html" %}
+{% block title %}Dashboard{% endblock %}
+
+{% block content %}
+<div class="card shadow-sm mb-4">
+  <div class="card-body d-flex flex-column flex-md-row justify-content-between gap-2">
+    <div>
+      <span class="badge text-bg-warning mb-2">DEMO SYSTEM</span>
+      <h1 class="h4 mb-1">Welcome, {{ profile.full_name }}</h1>
+      <p class="mb-0 text-muted">{{ profile.get_rank_display }} &middot; {{ profile.unit }}</p>
+    </div>
+    <div class="text-md-end">
+      <div class="small text-muted">Demo Police ID</div>
+      <div class="fw-semibold">{{ profile.demo_police_id }}</div>
+    </div>
+  </div>
+</div>
+
+<div class="row g-3 mb-4">
+  <div class="col-6 col-md-4">
+    <div class="card h-100 stat-card"><div class="card-body">
+      <div class="small text-muted">My verifications</div>
+      <div class="stat-number">{{ total_count }}</div>
+    </div></div>
+  </div>
+  <div class="col-6 col-md-4">
+    <div class="card h-100 stat-card"><div class="card-body">
+      <div class="small text-muted">Today</div>
+      <div class="stat-number">{{ today_count }}</div>
+    </div></div>
+  </div>
+  <div class="col-12 col-md-4">
+    <div class="card h-100 stat-card"><div class="card-body">
+      <div class="small text-muted">Last verification</div>
+      {% if last_log %}
+        <div class="fw-semibold">{{ last_log.created_at|date:"d M Y, H:i" }}</div>
+        <div class="small text-muted">{{ last_log.get_verification_type_display }}</div>
+      {% else %}
+        <div class="text-muted">None yet</div>
+      {% endif %}
+    </div></div>
+  </div>
+</div>
+
+<div class="row g-3 mb-4">
+  <div class="col-md-6">
+    <div class="card h-100"><div class="card-body">
+      <h2 class="h6">Vehicle Verification</h2>
+      <p class="small text-muted">Search a registration number in the demo database.</p>
+      <a href="{% url 'vehicles:search' %}" class="btn btn-primary">Verify a vehicle</a>
+    </div></div>
+  </div>
+  <div class="col-md-6">
+    <div class="card h-100"><div class="card-body">
+      <h2 class="h6">Driving Licence Verification</h2>
+      <p class="small text-muted">Search a licence number in the demo database.</p>
+      <a href="{% url 'licences:search' %}" class="btn btn-primary">Verify a licence</a>
+    </div></div>
+  </div>
+</div>
+
+<div class="card shadow-sm">
+  <div class="card-header bg-white d-flex justify-content-between align-items-center">
+    <strong>Recent verification history</strong>
+    <a href="{% url 'dashboard:history' %}" class="small">View all</a>
+  </div>
+  {% if recent_logs %}
+    <div class="table-responsive">
+      <table class="table table-sm align-middle mb-0">
+        <thead class="table-light">
+          <tr><th>Date and time</th><th>Type</th><th>Searched</th><th>Result</th></tr>
+        </thead>
+        <tbody>
+          {% for log in recent_logs %}
+          <tr>
+            <td class="text-nowrap">{{ log.created_at|date:"d M Y, H:i" }}</td>
+            <td>{{ log.get_verification_type_display }}</td>
+            <td><code>{{ log.masked_identifier }}</code></td>
+            <td>{% include "includes/result_badge.html" with code=log.result_category label=log.get_result_category_display %}</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  {% else %}
+    <div class="card-body text-center text-muted py-4">
+      No verifications yet. Your searches will appear here.
+    </div>
+  {% endif %}
+</div>
+{% endblock %}

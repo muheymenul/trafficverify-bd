@@ -1,0 +1,53 @@
+{% extends "admin/base_site.html" %}
+
+{% block breadcrumbs %}
+<div class="breadcrumbs">
+  <a href="{% url 'admin:index' %}">Home</a> &rsaquo;
+  <a href="{{ changelist_url }}">{{ opts.verbose_name_plural|capfirst }}</a> &rsaquo;
+  Import CSV
+</div>
+{% endblock %}
+
+{% block content %}
+<div id="content-main">
+
+  <p><strong>DEMO DATA only.</strong> Use fictional records. The whole file is checked first;
+  if any row has a problem, nothing is imported.</p>
+
+  {% if errors %}
+    <p class="errornote">Nothing was imported. Please fix these problems and upload the file again:</p>
+    <ul class="errorlist">
+      {% for error in errors %}<li>{{ error }}</li>{% endfor %}
+    </ul>
+  {% endif %}
+
+  <form method="post" enctype="multipart/form-data">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <input type="submit" value="Validate and import" class="default">
+  </form>
+
+  <h2>Columns</h2>
+  <table>
+    <thead>
+      <tr><th>Column</th><th>Required</th><th>Meaning</th></tr>
+    </thead>
+    <tbody>
+      {% for name, required, help in columns %}
+      <tr>
+        <td><code>{{ name }}</code></td>
+        <td>{% if required %}Yes{% else %}No{% endif %}</td>
+        <td>{{ help }}</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+
+  {% if notes %}
+    <h2>Notes</h2>
+    <ul>
+      {% for note in notes %}<li>{{ note }}</li>{% endfor %}
+    </ul>
+  {% endif %}
+</div>
+{% endblock %}

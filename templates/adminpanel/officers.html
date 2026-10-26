@@ -1,0 +1,75 @@
+{% extends "base.html" %}
+{% block title %}Officers{% endblock %}
+
+{% block content %}
+<h1 class="h4 mb-3">Admin Dashboard</h1>
+{% include "adminpanel/_tabs.html" %}
+
+<form method="get" class="card card-body shadow-sm mb-3">
+  <div class="row g-2 align-items-end">
+    <div class="col-12 col-md-5">
+      <label for="q" class="form-label small mb-1">Search</label>
+      <input type="text" id="q" name="q" value="{{ q }}" class="form-control"
+             placeholder="Username, email, name or Demo Police ID" maxlength="50">
+    </div>
+    <div class="col-12 col-md-3">
+      <label for="status" class="form-label small mb-1">Account status</label>
+      <select name="status" id="status" class="form-select">
+        <option value="">All</option>
+        <option value="active" {% if status == "active" %}selected{% endif %}>Active</option>
+        <option value="inactive" {% if status == "inactive" %}selected{% endif %}>Inactive</option>
+      </select>
+    </div>
+    <div class="col-12 col-md-4 d-flex gap-2">
+      <button type="submit" class="btn btn-primary flex-fill">Filter</button>
+      <a href="{% url 'adminpanel:officers' %}" class="btn btn-outline-secondary flex-fill">Clear</a>
+    </div>
+  </div>
+</form>
+
+<div class="card shadow-sm">
+  {% if page_obj.object_list %}
+  <div class="table-responsive">
+    <table class="table align-middle mb-0">
+      <thead class="table-light">
+        <tr>
+          <th>Username</th><th>Name (fictional)</th><th>Demo Police ID</th><th>Rank</th>
+          <th>Status</th><th class="text-end">Searches</th><th>Last login</th><th></th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for o in page_obj %}
+        <tr>
+          <td>{{ o.username }}<div class="small text-muted">{{ o.email|default:"-" }}</div></td>
+          <td>{{ o.police_profile.full_name|default:"-" }}</td>
+          <td>{{ o.police_profile.demo_police_id|default:"-" }}</td>
+          <td>{{ o.police_profile.get_rank_display|default:"-" }}</td>
+          <td>
+            {% if o.is_active %}
+              <span class="badge text-bg-success">Active</span>
+            {% else %}
+              <span class="badge text-bg-secondary">Inactive</span>
+            {% endif %}
+            {% if o.police_profile and not o.police_profile.is_eligible %}
+              <span class="badge text-bg-danger">Record disabled</span>
+            {% elif not o.police_profile %}
+              <span class="badge text-bg-warning">No record linked</span>
+            {% endif %}
+          </td>
+          <td class="text-end">{{ o.log_count }}</td>
+          <td class="text-nowrap">{{ o.last_login|date:"d M Y, H:i"|default:"Never" }}</td>
+          <td class="text-end">
+            <a href="{% url 'admin:accounts_user_change' o.pk %}" class="btn btn-outline-secondary btn-sm">Edit in Django Admin</a>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  {% else %}
+    <div class="card-body text-center text-muted py-5">No officers found{% if q or status %} for this filter{% endif %}.</div>
+  {% endif %}
+</div>
+
+{% include "includes/pagination.html" %}
+{% endblock %}
